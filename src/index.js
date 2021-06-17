@@ -1,18 +1,25 @@
-async function test(){
-    const get = await axios('https://www.githubstatus.com/');
-    const text = await texto(get); 
-    const cut = await getHTMLBody(text);
-    const log = await console.log(cut);
+import 'regenerator-runtime/runtime';
+import 'core-js/stable';
+import axios from 'axios';
+
+class getGithubStatus{
+    
+    async getData(){
+        const githubPage = await axios('https://www.githubstatus.com');
+        const githubData = await githubPage.data;
+        console.log(githubData);
+        return githubData;
+    };
+    
+    async getStatus(){
+        const page = await this.getData();
+        document.body.innerHTML = page;
+        const status = document.querySelectorAll('.component-container');
+        document.body.innerHTML = "";
+        status.forEach((data, index) => index !== 3 && document.body.appendChild(data));
+    };
+
 }
-function texto(data){ return document.body.innerText = data.data};
-function getHTMLBody(file){
-    let newFile = file.split('<div class="components-section font-regular">');
-    let finalFile = newFile[1].split('<div class="scheduled-maintenances-container">');
-    return document.body.innerHTML = finalFile[0];
-}
-test();
 
-
-
-
-
+const page = new getGithubStatus();
+page.getStatus();
