@@ -20,41 +20,44 @@ class getGithubStatus{
 
     async formatter(){
         const status = await this.getStatus();
+        this.createTitle();
         this.createContainer();
+        this.createFooter();
         status.forEach((data, index) => {
             if (index !== 3) {
-                let status = data.getAttribute('data-component-status');
-                status = this.defineStatus(status);
+                let statusText = data.getAttribute('data-component-status');
+                let status = this.defineStatus(statusText);
                 const statusName = data.firstElementChild.textContent
                 const className = statusName.trim().split(' ').join('-');
-                this.createDiv(className, statusName, status);
+                this.createDiv(className, statusName, status, statusText);
             };
         });
     };
 
-    createDiv(className, value, status){
-        const container = document.querySelector('.container');
+    createDiv(className, value, status, statusText){
+        const container = document.querySelector('.container ');
         const newDiv = document.createElement('div');
         newDiv.setAttribute('class', 'row');
         newDiv.classList.add(className);
         container.appendChild(newDiv);
         this.createElement('h2', value, newDiv);
-        this.createIcon(newDiv, status);
+        this.createIcon(newDiv, status, statusText);
     };
 
     createElement(element, value, container){
         const newElement = document.createElement(`${element}`);
         newElement.textContent = value;
+        newElement.setAttribute('class', 'col-10');
         container.appendChild(newElement);
     }
 
-    createIcon(container, status){
+    createIcon(container, status, statusDescription){
         const icon = this.defineIcon(status);
         const newIcon = document.createElement('i');
-        newIcon.setAttribute('class', `bi ${icon}`);
-        const description = this.defineDescription(status);
-        newIcon.setAttribute('aria-label', `${description}`);
+        newIcon.setAttribute('class', `bi ${icon} col-1`);
+        newIcon.setAttribute('aria-label', `${statusDescription.replace('-', ' ')}`);
         newIcon.setAttribute('role', `img`);
+        newIcon.style.color = status > 0 ? '#29b029' : 'red'; 
         container.appendChild(newIcon);
     }
 
@@ -62,9 +65,6 @@ class getGithubStatus{
         switch (status) {
             case 'operational':
                 return 1;
-            
-            case 'partial_outage':
-                return 0;
 
             default:
                 return -1;
@@ -76,39 +76,28 @@ class getGithubStatus{
             case 1:
                 return 'bi-check-circle-fill';
 
-            case 0:
-                return 'bi-exclamation-circle';
-
             case -1:
                 return 'bi-exclamation-circle-fill'
         }
     }
 
-    defineDescription(status) {
-        switch(status){
-            case 1:
-                return 'operational';
-
-            case 0:
-                return 'partial outage';
-
-            case -1:
-                return 'not working'
-        }
-    }
     
     createContainer(){
         const container = document.createElement('main');
         container.setAttribute('class', 'container');
         document.body.appendChild(container);
     }
+    
+    createTitle(){
+        const title = document.createElement('h1');
+        title.textContent = 'Github Status';
+        document.body.appendChild(title);
+    }
 
-    style(){
-        const status = document.querySelectorAll('.component-container');
-        status.forEach((div) => {
-            div.classList.add('row');
-            div.classList.add('justify-content-center');
-        });
+    createFooter(){
+        const footer = document.createElement('footer');
+        footer.innerHTML = '<a href="https://github.com/Bruno-Lages/github-pages"><i class="bi bi-github" role="img" aria-label="GitHub link" style="color: #c1dcec" ></i></a>';
+        document.body.appendChild(footer);
     }
 
 }
